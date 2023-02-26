@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+# Configuration and credential files
+credentials.ini
