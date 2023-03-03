@@ -33,3 +33,9 @@
 
 # Configuration and credential files
 credentials.ini
+
+# CMake files
+*CMakeCache.txt
+*CMakeFiles/
+*Makefile
+*.cmake
