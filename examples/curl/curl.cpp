@@ -6,7 +6,7 @@
 #include <math.h>
 
 #define CURL_STATICLIB
-#include <curl\curl.h>
+#include <curl/curl.h>
 
 using std::endl;
 using std::cerr;
