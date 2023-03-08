@@ -3,6 +3,22 @@
 
 #define CURL_STATICLIB
 #include <curl/curl.h>
+#include <string>
+class Planet {
+private:
+    std::string name;
+    long index;
+    glm::vec3 pos;
+    float radius;
+    std::string dataDate;
+public:
+    Planet(std::string name="JWS");
+
+    void updateData(glm::vec3 pos, float radius, std::string dataDate);
+    std::string getDataDate();
+    std::string getName();
+    long getIndex();
+};
 
 /**
  * @brief Client object used to load and define a client interface to the NASA APIs
