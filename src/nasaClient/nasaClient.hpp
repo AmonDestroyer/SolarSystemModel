@@ -7,20 +7,24 @@
 #include <vector>
 #include <glm/vec3.hpp>
 
-class Planet {
+class Body {
 private:
     std::string name;
     long index;
     glm::vec3 pos;
     float radius;
     std::string dataDate;
+    glm::vec3 color;
 public:
-    Planet(std::string name="JWS");
+    Body(std::string name, glm::vec3 color=glm::vec3(1, 1, 1));
 
     void updateData(glm::vec3 pos, float radius, std::string dataDate);
     std::string getDataDate();
+    glm::vec3 getPos();
+    float getRadius();
     std::string getName();
     long getIndex();
+    glm::vec3 getColor();
 };
 
 /**
@@ -58,7 +62,7 @@ public:
 
     void setKey(std::string key);
 
-    void getPlanetaryData(Planet &planet, std::string date);
+    void getBodyData(Body &body, std::string date);
 
     /**
      * @brief Used to test if the client object works correctly with curl

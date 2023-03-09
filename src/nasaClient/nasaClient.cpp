@@ -27,7 +27,7 @@ std::map<std::string, long>objects = {
     {"Venus", 2},
     {"Earth", 399},
     {"Moon", 301},
-    {"Mars", 4},
+    {"Mars", 499},
     {"Jupiter", 599},
     {"Saturn", 699},
     {"Uranus", 799},
@@ -48,6 +48,10 @@ NasaClient::~NasaClient() {
     curl_easy_cleanup(this->curl);
 }
 
+
+//...............................................................................................................
+// Public Methods
+//...............................................................................................................
 void NasaClient::setEndpoint(std::string endpoint) {
     this->endpoint = endpoint;
 }
@@ -57,12 +61,12 @@ void NasaClient::setKey(std::string key) {
     this->apiKey = key;
 }
 
-void NasaClient::getPlanetaryData(Planet &planet, std::string date) {
-    if (planet.getDataDate() == date)
+void NasaClient::getBodyData(Body &body, std::string date) {
+    if (body.getDataDate() == date)
         return;
     struct memory chunk = {0};
     std::string juliandDate = this->getJulianDate(date);
-    std::string endpoint = "https://ssd.jpl.nasa.gov/api/horizons.api?COMMAND='" + std::to_string(planet.getIndex()) + "'" +
+    std::string endpoint = "https://ssd.jpl.nasa.gov/api/horizons.api?COMMAND='" + std::to_string(body.getIndex()) + "'" +
                             "&EPHEM_TYPE='VECTORS'" +
                             "&START_TIME='JD" + juliandDate.c_str() + "'" +
                             "&STOP_TIME='JD" + std::to_string(atol(juliandDate.c_str()) + 1) + "'" +
@@ -95,20 +99,19 @@ void NasaClient::getPlanetaryData(Planet &planet, std::string date) {
     // Get Physical Data
     //Radius
     float radius = 0;
-    if (planet.getIndex() > 0) {
+    if (body.getIndex() > 0) {
         std::string radiusTag[3] = {"radius", "= ", " "};
         size_t radiusIndex[3];
         radiusIndex[0] = result.find(radiusTag[0]);
         radiusIndex[1] = result.find(radiusTag[1], radiusIndex[0]) + radiusTag[1].length();
         radiusIndex[2] = result.find(radiusTag[2], radiusIndex[1]);
-        cerr << "DEBUG: " << radiusIndex[0] << ", " << radiusIndex[1] << ", " << radiusIndex[2] << endl;
         char radiusText[BUFSIZ];
         result.copy(radiusText, radiusIndex[2] - radiusIndex[1], radiusIndex[1]);
         radius = atof(radiusText);
     }
 
     //Update Data
-    planet.updateData(pos, radius, date);
+    body.updateData(pos, radius, date);
 }
 
 void NasaClient::test() {
@@ -119,10 +122,10 @@ void NasaClient::test() {
     cerr << "Converted Julian Date: " << julianDate << endl;
     std::string calendarDate = this->getCalendarDate(std::to_string(atol(julianDate.c_str()) + 1));
     cerr << "Converted provided Julian Date to Calendar Date: " << calendarDate << endl;
-    Planet sun("Sun");
-    this->getPlanetaryData(sun, "2023-03-07");
-    Planet jws("JWS");
-    this->getPlanetaryData(jws, "2023-03-07");
+    Body sun("Sun");
+    this->getBodyData(sun, "2023-03-07");
+    Body jws("JWS");
+    this->getBodyData(jws, "2023-03-07");
     cerr << "Cleaned up Curl" << endl;
 }
 
@@ -160,32 +163,45 @@ std::string NasaClient::convertDate(std::string date, std::string dateType, std:
 // Construct
 //...............................................................................................................
 
-Planet::Planet(std::string name) {
+Body::Body(std::string name, glm::vec3 color) {
     this->name = name;
     this->index = objects[name];
     this->dataDate = "";
+    this->color = color;
 }
 
 //...............................................................................................................
 // Public Functions
 //...............................................................................................................
 
-void Planet::updateData(glm::vec3 pos, float radius, std::string dataDate) {
+void Body::updateData(glm::vec3 pos, float radius, std::string dataDate) {
     this->pos = pos;
     this->radius = radius;
     this->dataDate = dataDate;
 }
 
-std::string Planet::getDataDate() {
+std::string Body::getDataDate() {
     return this->dataDate;
 }
 
-std::string Planet::getName() {
+std::string Body::getName() {
     return this->name;
 }
 
-long Planet::getIndex() {
+long Body::getIndex() {
     return this->index;
+}
+
+glm::vec3 Body::getPos() {
+    return this->pos;
+}
+
+float Body::getRadius() {
+    return this->radius;
+}
+
+glm::vec3 Body::getColor() {
+    return this->color;
 }
 
 //===============================================================================================================
