@@ -1,4 +1,5 @@
 #include "renderManager/renderManager.hpp"
+#include <iostream>
 
 //Helper Funciton Definition
 const char *GetVertexShader();
@@ -8,14 +9,12 @@ void SetUpVBOs(std::vector<float> &coords, std::vector<float> &normals,
                GLuint &points_vbo, GLuint &normals_vbo, GLuint &index_vbo);
 
 // Constructor
-RenderManager::RenderManager()
+RenderManager::RenderManager(int width, int height)
 {
-  SetUpWindowAndShaders();
+  SetUpWindowAndShaders(width, height);
   SetUpGeometry();
-  projection = glm::perspective(
-        glm::radians(45.0f), (float)1000 / (float)1000,  5.0f, 100.0f);
-
   // Get a handle for our MVP and color uniforms
+
   mvploc = glGetUniformLocation(shaderProgram, "MVP");
   colorloc = glGetUniformLocation(shaderProgram, "color");
   camloc = glGetUniformLocation(shaderProgram, "cameraloc");
@@ -27,7 +26,7 @@ RenderManager::RenderManager()
 }
 
 // Private Methods
-void RenderManager::SetUpWindowAndShaders()
+void RenderManager::SetUpWindowAndShaders(int width, int height)
 {
   // start GL context and O/S window using the GLFW helper library
   if (!glfwInit()) {
@@ -40,7 +39,7 @@ void RenderManager::SetUpWindowAndShaders()
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  window = glfwCreateWindow(700, 700, "CIS 441", NULL, NULL);
+  window = glfwCreateWindow(width, height, "CIS 441", NULL, NULL);
   if (!window) {
     fprintf(stderr, "ERROR: could not open window with GLFW3\n");
     glfwTerminate();
@@ -99,11 +98,11 @@ void RenderManager::MakeModelView(glm::mat4 &model)
 }
 
 // Public Methods
-void RenderManager::SetView(glm::vec3 &camera, glm::vec3 &origin, glm::vec3 &up)
+void RenderManager::SetView(glm::vec3 &camera, glm::vec3 &origin, glm::vec3 &up, glm::vec3 &lookDir)
 { 
    glm::mat4 v = glm::lookAt(
                        camera, // Camera in world space
-                       origin, // looks at the origin
+                       camera + lookDir, // looks at the origin
                        up      // and the head is up
                  );
    view = v; 
@@ -178,6 +177,10 @@ void RenderManager::Render(ShapeType st, glm::mat4 model)
    MakeModelView(model);
    glUniform3fv(colorloc, 1, &color[0]);
    glDrawElements(GL_TRIANGLES, numPrimitives, GL_UNSIGNED_INT, NULL);
+}
+
+void RenderManager::updateProjection(float fov) {
+  this->projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
 }
 
 // Helper Functions
