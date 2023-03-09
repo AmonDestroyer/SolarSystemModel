@@ -20,11 +20,12 @@ const char *GetVertexShader();
 const char *GetFragmentShader();
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void setInitialView(glm::vec3 viewDirection);
 
 int width = 700;
 int height = 700;
 bool firstMouse = true;
-float yaw = -90.0f;
+float yaw = 0.0f;
 float pitch = 0.0f;
 float lastX = (float)width / 2.0;
 float lastY = (float)height / 2.0;
@@ -45,26 +46,28 @@ int main()
   RenderManager rm;
   GLFWwindow *window = rm.GetWindow();
 
-  glm::vec3 origin(0, 0, 0);
   glm::vec3 up(0, 1, 0);
   int counter=0;
 
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
   glfwSetCursorPosCallback(window, mouse_callback);  
   glfwSetScrollCallback(window, scroll_callback);
+
+    Body *jws = model.getBody("JWS");
+    glm::vec3 camera = jws->getPos();
+    Body *earth = model.getBody("Earth");
+    glm::vec3 origin = earth->getPos();
+    origin = glm::vec3(0, 0, 0);
+    camera = glm::vec3(20, 0, 5);
+    direction = glm::normalize(origin - camera);
+    setInitialView(direction);
   
   while (!glfwWindowShouldClose(window)) {
     double angle=counter/2000.0*2*M_PI;
     counter++;
     //angle = 3*M_PI/8;
 
-    Body *jws = model.getBody("JWS");
-    glm::vec3 camera = jws->getPos();
-    Body *earth = model.getBody("Earth");
-    glm::vec3 dir = glm::normalize(direction);
-    glm::vec3 origin = earth->getPos() + glm::normalize(direction);
-    origin = glm::vec3(0, 0, 0);
-    camera = glm::vec3(20, 0, 5);
+    
     glm::vec3 lookDir = glm::normalize(direction);
     // TODO: The far plane for the camera is set to 100, I need to figure out where this is set so I can
     // Update that value to be rediculously large.
@@ -118,6 +121,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
         lastX = xpos;
         lastY = ypos;
         firstMouse = false;
+        return;
     }
   
     float xoffset = xpos - lastX;
@@ -140,4 +144,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction = glm::normalize(direction);
 }  
+
+void setInitialView(glm::vec3 viewDirection) {
+    viewDirection = glm::normalize(viewDirection);
+    pitch = glm::degrees(asin(-viewDirection.y));
+    yaw = glm::degrees(atan2(viewDirection.x, viewDirection.z));
+}

@@ -102,7 +102,7 @@ void RenderManager::SetView(glm::vec3 &camera, glm::vec3 &origin, glm::vec3 &up,
 { 
    glm::mat4 v = glm::lookAt(
                        camera, // Camera in world space
-                       camera + lookDir, // looks at the origin
+                       camera + lookDir,
                        up      // and the head is up
                  );
    view = v; 
