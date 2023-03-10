@@ -180,7 +180,7 @@ void RenderManager::Render(ShapeType st, glm::mat4 model)
 }
 
 void RenderManager::updateProjection(float fov) {
-  this->projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+  this->projection = glm::perspective(glm::radians(fov), 700.0f / 700.0f, 1000.0f, 6000000000.0f);
 }
 
 // Helper Functions
