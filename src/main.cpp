@@ -57,8 +57,6 @@ int main()
     glm::vec3 camera = jws->getPos();
     Body *earth = model.getBody("Earth");
     glm::vec3 origin = earth->getPos();
-    origin = glm::vec3(0, 0, 0);
-    camera = glm::vec3(20, 0, 5);
     direction = glm::normalize(origin - camera);
     setInitialView(direction);
   
@@ -108,8 +106,8 @@ int main()
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     fov -= (float)yoffset;
-    if (fov < 1.0f)
-        fov = 1.0f;
+    if (fov < 0.001f)
+        fov = 0.001f;
     if (fov > 45.0f)
         fov = 45.0f; 
 }

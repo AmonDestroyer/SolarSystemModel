@@ -60,17 +60,15 @@ Model::~Model() {
 void Model::generateModel(RenderManager &rm) {
     glm::mat4 identity(1.0f);
 
-    // for (auto const& pair : this->bodys) {
-    //     glm::vec3 pos = pair.second->getPos();
-    //     glm::mat4 translate = TranslateMatrix(pos.x, pos.y, pos.z);
-    //     float radius = pair.second->getRadius();
-    //     glm::mat4 scale = ScaleMatrix(radius, radius, radius);
-    //     glm::vec3 color = pair.second->getColor();
-    //     rm.SetColor(color.x, color.y, color.z);
-    //     rm.Render(RenderManager::SPHERE, identity * translate * scale);
-    // }
-    rm.SetColor(1, 1, 1);
-    rm.Render(RenderManager::SPHERE, identity);
+    for (auto const& pair : this->bodys) {
+        glm::vec3 pos = pair.second->getPos();
+        glm::mat4 translate = TranslateMatrix(pos.x, pos.y, pos.z);
+        float radius = pair.second->getRadius();
+        glm::mat4 scale = ScaleMatrix(radius, radius, radius);
+        glm::vec3 color = pair.second->getColor();
+        rm.SetColor(color.x, color.y, color.z);
+        rm.Render(RenderManager::SPHERE, identity * translate * scale);
+    }
 }
 
 void Model::setDate(std::string date) {
