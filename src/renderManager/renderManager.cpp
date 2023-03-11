@@ -99,11 +99,11 @@ void RenderManager::MakeModelView(glm::mat4 &model)
 }
 
 // Public Methods
-void RenderManager::SetView(glm::vec3 &camera, glm::vec3 &origin, glm::vec3 &up, glm::vec3 &lookDir)
+void RenderManager::SetView(glm::vec3 &camera, glm::vec3 &target, glm::vec3 &up)
 { 
    glm::mat4 v = glm::lookAt(
                        camera, // Camera in world space
-                       origin, // Look at the desired object
+                       target, // Look at the desired object
                        up      // and the head is up
                  );
    view = v; 

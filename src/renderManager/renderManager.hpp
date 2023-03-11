@@ -37,7 +37,7 @@ public:
     };
 
     RenderManager(int width=700, int height=700, vec3 lightLoc=vec3(0,0,0));
-    void SetView(vec3 &camera, vec3 &origin, vec3 &up, glm::vec3 &lookDir);
+    void SetView(vec3 &camera, vec3 &target, vec3 &up);
     void SetUpGeometry();
     void SetColor(double r, double g, double b);
     void Render(ShapeType, mat4 model);
