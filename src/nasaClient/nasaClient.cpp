@@ -108,6 +108,15 @@ void NasaClient::getBodyData(Body &body, std::string date) {
         char radiusText[BUFSIZ];
         result.copy(radiusText, radiusIndex[2] - radiusIndex[1], radiusIndex[1]);
         radius = atof(radiusText);
+        if (radius == 0) {
+            std::string secondaryTag[3] = {"Radius (km) ", "=  ", " "};
+            radiusIndex[0] = result.find(secondaryTag[0]);
+            radiusIndex[1] = result.find(secondaryTag[1], radiusIndex[0]) + secondaryTag[1].length();
+            radiusIndex[2] = result.find(secondaryTag[2], radiusIndex[1]);
+            char radiusText[BUFSIZ];
+            result.copy(radiusText, radiusIndex[2] - radiusIndex[1], radiusIndex[1]);
+            radius = atof(radiusText);
+        }
     }
 
     //Update Data
