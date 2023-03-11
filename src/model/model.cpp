@@ -20,17 +20,18 @@ glm::mat4 RotateMatrix(float degrees, float x, float y, float z);
 glm::mat4 ScaleMatrix(double x, double y, double z);
 glm::mat4 TranslateMatrix(double x, double y, double z);
 
-std::string body_names[] = {"Sun",
-                            "Mercury", 
-                            "Venus",
-                            "Earth",
-                            "Moon",
-                            "Mars",
-                            "Jupiter",
-                            "Saturn",
-                            "Uranus",
-                            "Neptune",
-                            "JWS"};
+std::map<std::string, glm::vec3> body_info = {
+    {"Sun", glm::vec3(1, 0.80, 0.20)},
+    {"Mercury", glm::vec3(0.894, 0.788, 0.6)}, 
+    {"Venus", glm::vec3(0.773, 0.447, 0.133)},
+    {"Earth", glm::vec3(0.204, 0.365, 0.545)},
+    {"Moon", glm::vec3(1, 0.961, 0.925)},
+    {"Mars", glm::vec3(0.91, 0.396, 0.227)},
+    {"Jupiter", glm::vec3(0.824, 0.71, 0.518)},
+    {"Saturn", glm::vec3(0.816, 0.702, 0.467)},
+    {"Uranus", glm::vec3(0.031, 0.459, 0.588)},
+    {"Neptune", glm::vec3(0.424, 0.561, 0.89)},
+    {"JWS", glm::vec3(1, 1, 1)}};
 
 //===============================================================================================================
 // Model Class
@@ -39,12 +40,14 @@ std::string body_names[] = {"Sun",
 //...............................................................................................................
 Model::Model(const std::string date) {
     this->date = date;
-    this->nbodys = end(body_names) - begin(body_names);
-    for (long i = 0; i < this->nbodys; i++) {
-        std::string name = body_names[i];
-        this->bodys.insert({name, new Body(name)});
-        this->client.getBodyData(*this->bodys[name], date);
-        glm::vec3 pos = this->bodys[name]->getPos();
+    this->nbodys = 0;
+    for (auto const& pair : body_info) {
+        std::string name = pair.first;
+        this->bodys.insert({name, new Body(name, pair.second)});
+        Body *body = this->bodys[name];
+        this->client.getBodyData(*body, date);
+        glm::vec3 pos = body->getPos();
+        this->nbodys++;
     }
 }
 
@@ -72,7 +75,6 @@ void Model::generateModel(RenderManager &rm) {
 }
 
 void Model::setDate(std::string date) {
-    int nbodys = end(body_names) - begin(body_names);
     for (auto const& pair : this->bodys) {
         this->client.getBodyData(*pair.second, date);
     }
