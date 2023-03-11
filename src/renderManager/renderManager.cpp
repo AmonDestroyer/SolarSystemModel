@@ -9,7 +9,7 @@ void SetUpVBOs(std::vector<float> &coords, std::vector<float> &normals,
                GLuint &points_vbo, GLuint &normals_vbo, GLuint &index_vbo);
 
 // Constructor
-RenderManager::RenderManager(int width, int height)
+RenderManager::RenderManager(int width, int height, vec3 lightLoc)
 {
   SetUpWindowAndShaders(width, height);
   SetUpGeometry();
@@ -23,6 +23,7 @@ RenderManager::RenderManager(int width, int height)
   glm::vec4 lightcoeff(0.3, 0.7, 2.8, 50.5); // Lighting coeff, Ka, Kd, Ks, alpha
   GLuint lcoeloc = glGetUniformLocation(shaderProgram, "lightcoeff");
   glUniform4fv(lcoeloc, 1, &lightcoeff[0]);
+  this->lightLoc = lightLoc;
 }
 
 // Private Methods
@@ -102,13 +103,13 @@ void RenderManager::SetView(glm::vec3 &camera, glm::vec3 &origin, glm::vec3 &up,
 { 
    glm::mat4 v = glm::lookAt(
                        camera, // Camera in world space
-                       camera + lookDir,
+                       origin, // Look at the desired object
                        up      // and the head is up
                  );
    view = v; 
    glUniform3fv(camloc, 1, &camera[0]);
    // Direction of light
-   glm::vec3 lightdir = glm::normalize(camera - origin);   
+   glm::vec3 lightdir = glm::normalize(camera - this->lightLoc);   
    glUniform3fv(ldirloc, 1, &lightdir[0]);
 }
 
@@ -179,8 +180,12 @@ void RenderManager::Render(ShapeType st, glm::mat4 model)
    glDrawElements(GL_TRIANGLES, numPrimitives, GL_UNSIGNED_INT, NULL);
 }
 
-void RenderManager::updateProjection(float fov) {
-  this->projection = glm::perspective(glm::radians(fov), 700.0f / 700.0f, 1000.0f, 10000000000.0f);
+void RenderManager::updateProjection(float fov, float near, float far) {
+  this->projection = glm::perspective(glm::radians(fov), 700.0f / 700.0f, near, far);
+}
+
+void RenderManager::updateLightLoc(vec3 lightLoc) {
+  this->lightLoc = lightLoc;
 }
 
 // Helper Functions
