@@ -200,6 +200,10 @@ float Body::getRadius() {
     return this->radius;
 }
 
+void Body::setColor(glm::vec3 color) {
+    this->color = color;
+}
+
 glm::vec3 Body::getColor() {
     return this->color;
 }

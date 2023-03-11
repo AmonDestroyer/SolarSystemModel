@@ -24,6 +24,7 @@ public:
     float getRadius();
     std::string getName();
     long getIndex();
+    void setColor(glm::vec3 color);
     glm::vec3 getColor();
 };
 
