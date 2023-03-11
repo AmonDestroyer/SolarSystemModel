@@ -32,3 +32,12 @@ TODO:
 - List improvements to usage
 - List improvements and steps to make the project better
 
+## Learnings
+- Have a near and far frustom that are are too far appart from each other will cause issues like missing triangles seen here.
+
+![Distant Frustom Artifacting](/imgs/sphereArtifacting.png "Distant Frustom Artifacting")
+
+
+## Future Improvements
+- Add obliquity (axial tilt) for each planet.
+- Allow planets to rotate around their own axis.
