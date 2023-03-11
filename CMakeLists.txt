@@ -86,7 +86,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
   PUBLIC glfw ${OPENGL_gl_LIBRARY}
-  PRIVATE renderManager)
+  PRIVATE renderManager nasaClient)
 
 #####################################################################
 # Space Executable
@@ -107,5 +107,5 @@ message("GL link libraries: ${OPENGL_gl_LIBRARY}")
 add_executable(${PROJECT_NAME} src/main.cpp) 
 target_link_libraries(${PROJECT_NAME}
   PUBLIC ${OPENGL_gl_LIBRARY} 
-  PRIVATE nasaClient renderManager shaders model) 
+  PRIVATE renderManager shaders model) 
 
