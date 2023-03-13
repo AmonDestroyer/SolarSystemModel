@@ -1,5 +1,5 @@
-#include "nasaClient/nasaClient.hpp"
-#include <nasaClient/json.hpp>
+#include "nasaClient.hpp"
+#include "json.hpp"
 
 #include <map>
 #include <iostream>
@@ -74,7 +74,7 @@ void NasaClient::getBodyData(Body &body, std::string date) {
     curl_easy_setopt(this->curl, CURLOPT_URL, endpoint.c_str());
     curl_easy_setopt(this->curl, CURLOPT_WRITEFUNCTION, cb);
     curl_easy_setopt(this->curl, CURLOPT_WRITEDATA, (void *)&chunk);
-    CURLcode res = curl_easy_perform(curl);
+    curl_easy_perform(curl);
     json data = json::parse(chunk.response);
     free(chunk.response);
     std::string result = data["result"];
@@ -160,14 +160,14 @@ std::string NasaClient::convertDate(std::string date, std::string dateType, std:
     curl_easy_setopt(this->curl, CURLOPT_URL, converterEndpoint.c_str());
     curl_easy_setopt(this->curl, CURLOPT_WRITEFUNCTION, cb);
     curl_easy_setopt(this->curl, CURLOPT_WRITEDATA, (void *)&chunk);
-    CURLcode res = curl_easy_perform(curl);
+    curl_easy_perform(curl);
     json data = json::parse(chunk.response);
     free(chunk.response);
     return data[returnDateType];
 }
 
 //===============================================================================================================
-// Planet Class
+// Body Class
 //...............................................................................................................
 // Construct
 //...............................................................................................................
@@ -215,6 +215,14 @@ void Body::setColor(glm::vec3 color) {
 
 glm::vec3 Body::getColor() {
     return this->color;
+}
+
+void Body::setTexId(GLuint texId) {
+    this->texId = texId;
+}
+
+GLuint Body::getTexId() {
+    return this->texId;
 }
 
 //===============================================================================================================

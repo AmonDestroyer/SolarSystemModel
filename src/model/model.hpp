@@ -1,8 +1,7 @@
 #ifndef Model_h
 #define Model_h
 
-#include "../renderManager/renderManager.hpp"
-#include "../nasaClient/nasaClient.hpp"
+#include "nasaClient/nasaClient.hpp"
 #include <string>
 #include <map>
 
@@ -11,13 +10,13 @@ private:
     std::string date;
     std::map<std::string, Body *> bodys;
     long nbodys;
-    NasaClient client;
+    NasaClient *client;
 public:
     Model(const std::string date);
-    ~Model();
+    // ~Model();
 
-    void generateModel(RenderManager &rm);
+    // void generateModel(RenderManager &rm);
     void setDate(std::string date);
-    Body * getBody(std::string name);
+    Body *getBody(std::string name);
 };
-#endif
+#endif 

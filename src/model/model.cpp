@@ -1,24 +1,12 @@
-#include "model/model.hpp"
+#include "model.hpp"
 #include <iostream>
+#include<bits/stdc++.h>
 
 //===============================================================================================================
 // Helper Function Definition
 //===============================================================================================================
-void SetUpEyeball(glm::mat4 modelSoFar, RenderManager &rm, bool right);
-void SetUpTopMouth(glm::mat4 modelSoFar, RenderManager& rm);
-void SetupBotMouth(glm::mat4 modelSoFar, RenderManager& rm);
-void SetUpEar(glm::mat4 modelSoFar, RenderManager& rm, bool is_left=false);
-void SetUpHead(glm::mat4 modelSoFar, RenderManager &rm, double var);
-void SetUpNeck(glm::mat4 modelSoFar, RenderManager& rm);
-void SetUpLeg(glm::mat4 modelSoFar, RenderManager& rm);
-void SetUpLegs(glm::mat4 modelSoFar, RenderManager& rm, bool back);
-void SetUpCenterBody(glm::mat4 modelSoFar, RenderManager& rm, double offset);
-void SetUpBody(glm::mat4 modelSoFar, RenderManager& rm, double var);
 
 // Transformation Matricies
-glm::mat4 RotateMatrix(float degrees, float x, float y, float z);
-glm::mat4 ScaleMatrix(double x, double y, double z);
-glm::mat4 TranslateMatrix(double x, double y, double z);
 
 std::map<std::string, glm::vec3> body_info = {
     {"Sun", glm::vec3(1, 0.80, 0.20)},
@@ -39,44 +27,47 @@ std::map<std::string, glm::vec3> body_info = {
 // Constructor and Destructor
 //...............................................................................................................
 Model::Model(const std::string date) {
+    this->client = new NasaClient();
     this->date = date;
     this->nbodys = 0;
     for (auto const& pair : body_info) {
         std::string name = pair.first;
         this->bodys.insert({name, new Body(name, pair.second)});
         Body *body = this->bodys[name];
-        this->client.getBodyData(*body, date);
-        glm::vec3 pos = body->getPos();
+        this->client->getBodyData(*body, date);
         this->nbodys++;
-    }
+    }    
 }
 
-Model::~Model() {
-    for (auto const& pair : this->bodys) {
-        delete pair.second;
-    }
-}
+// Model::~Model() {
+//     // for (auto const& pair : this->bodys) {
+//     //     delete pair.second;
+//     // }
+// }
 
 //...............................................................................................................
 // Public Methods
 //...............................................................................................................
-void Model::generateModel(RenderManager &rm) {
-    glm::mat4 identity(1.0f);
+// void Model::generateModel(RenderManager &rm) {
+//     glm::mat4 identity(1.0f);
 
-    for (auto const& pair : this->bodys) {
-        glm::vec3 pos = pair.second->getPos();
-        glm::mat4 translate = TranslateMatrix(pos.x, pos.y, pos.z);
-        float radius = pair.second->getRadius();
-        glm::mat4 scale = ScaleMatrix(radius, radius, radius);
-        glm::vec3 color = pair.second->getColor();
-        rm.SetColor(color.x, color.y, color.z);
-        rm.Render(RenderManager::SPHERE, identity * translate * scale);
-    }
-}
+//     for (auto const& pair : this->bodys) {
+//         glBindTexture(GL_TEXTURE_2D, this->textureMap.at(pair.first));
+//         glm::vec3 pos = pair.second->getPos();
+//         glm::mat4 translate = TranslateMatrix(pos.x, pos.y, pos.z);
+//         float radius = pair.second->getRadius();
+//         glm::mat4 scale = ScaleMatrix(radius, radius, radius);
+//         glm::vec3 color = pair.second->getColor();
+//         rm.SetColor(color.x, color.y, color.z);
+//         rm.Render(RenderManager::SPHERE, identity * translate * scale);
+//         // rm.Render(pos, radius, 0);
+//     }
+//     glBindTexture(GL_TEXTURE_2D, 0);
+// }
 
 void Model::setDate(std::string date) {
     for (auto const& pair : this->bodys) {
-        this->client.getBodyData(*pair.second, date);
+        this->client->getBodyData(*pair.second, date);
     }
 }
 
@@ -87,25 +78,3 @@ Body * Model::getBody(std::string name) {
 //===============================================================================================================
 // Helper Functions
 //===============================================================================================================
-glm::mat4 RotateMatrix(float degrees, float x, float y, float z)
-{
-   glm::mat4 identity(1.0f);
-   glm::mat4 rotation = glm::rotate(identity, 
-                                    glm::radians(degrees), 
-                                    glm::vec3(x, y, z));
-   return rotation;
-}
-
-glm::mat4 ScaleMatrix(double x, double y, double z)
-{
-   glm::mat4 identity(1.0f);
-   glm::vec3 scale(x, y, z);
-   return glm::scale(identity, scale);
-}
-
-glm::mat4 TranslateMatrix(double x, double y, double z)
-{
-   glm::mat4 identity(1.0f);
-   glm::vec3 translate(x, y, z);
-   return glm::translate(identity, translate);
-}

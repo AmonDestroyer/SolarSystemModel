@@ -7,6 +7,13 @@
 #include <vector>
 #include <glm/vec3.hpp>
 
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
+// #include <GL/glut.h>
+#include <GL/glut.h>
+#endif
+
 class Body {
 private:
     std::string name;
@@ -15,6 +22,7 @@ private:
     float radius;
     std::string dataDate;
     glm::vec3 color;
+    GLuint texId;
 public:
     Body(std::string name, glm::vec3 color=glm::vec3(1, 1, 1));
 
@@ -26,6 +34,8 @@ public:
     long getIndex();
     void setColor(glm::vec3 color);
     glm::vec3 getColor();
+    void setTexId(GLuint texId);
+    GLuint getTexId();
 };
 
 /**
