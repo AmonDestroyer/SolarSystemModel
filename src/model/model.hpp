@@ -17,6 +17,7 @@ public:
 
     // void generateModel(RenderManager &rm);
     void setDate(std::string date);
+    std::string getDate();
     Body *getBody(std::string name);
 };
 #endif 

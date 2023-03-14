@@ -1,13 +1,10 @@
 #include "model.hpp"
 #include <iostream>
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 
 //===============================================================================================================
-// Helper Function Definition
+// Constants Definition
 //===============================================================================================================
-
-// Transformation Matricies
-
 std::map<std::string, glm::vec3> body_info = {
     {"Sun", glm::vec3(1, 0.80, 0.20)},
     {"Mercury", glm::vec3(0.894, 0.788, 0.6)}, 
@@ -69,6 +66,11 @@ void Model::setDate(std::string date) {
     for (auto const& pair : this->bodys) {
         this->client->getBodyData(*pair.second, date);
     }
+    this->date = date;
+}
+
+std::string Model::getDate() {
+    return this->date;
 }
 
 Body * Model::getBody(std::string name) {
