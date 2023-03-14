@@ -325,9 +325,9 @@ void clearSharedMem()
 void initLights()
 {
     // set up light colors (ambient, diffuse, specular)
-    GLfloat lightKa[] = {.2f, .2f, .2f, 1.0f};  // ambient light
+    GLfloat lightKa[] = {0, 0, 0, 1};           // specular light
     GLfloat lightKd[] = {.7f, .7f, .7f, 1.0f};  // diffuse light
-    GLfloat lightKs[] = {1, 1, 1, 1};           // specular light
+    GLfloat lightKs[] = {0, 0, 0, 1};           // specular light
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightKa);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightKd);
     glLightfv(GL_LIGHT0, GL_SPECULAR, lightKs);
@@ -483,6 +483,10 @@ void showInfo()
     drawString(ss.str().c_str(), 1, screenHeight-(line++ * TEXT_HEIGHT), color, font);
     ss.str("");
 
+    ss << "Space = Refocus to Target" << std::ends;
+    drawString(ss.str().c_str(), 1, screenHeight-(line++ * TEXT_HEIGHT), color, font);
+    ss.str("");
+
     // unset floating format
     ss << std::resetiosflags(std::ios_base::fixed | std::ios_base::floatfield);
 
@@ -565,10 +569,10 @@ void displayCB()
     
 
     // set material
-    float ambient[]  = {0.3f, 0.3f, 0.3f, 1};
+    float ambient[]  = {0.1f, 0.1f, 0.1f, 1};
     float diffuse[]  = {0.7f, 0.7f, 0.7f, 1};
     float specular[] = {1.0f, 1.0f, 1.0f, 1};
-    float shininess  = 128;
+    float shininess  = 32;
     glMaterialfv(GL_FRONT, GL_AMBIENT,   ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE,   diffuse);
     glMaterialfv(GL_FRONT, GL_SPECULAR,  specular);
@@ -646,6 +650,10 @@ void keyboardCB(unsigned char key, int x, int y)
         break;
     case '`':
         getUserDateInput();
+        break;
+
+    case ' ':
+        focusCurrentBody();
         break;
 
     default:
@@ -802,7 +810,7 @@ void generateModel() {
             GLuint texId = textureIds[i];
             glPushMatrix();
             glTranslatef(bodyPos.x, bodyPos.y, bodyPos.z);
-            glRotatef(-90, 1, 0, 0);
+            glRotatef(-90, 0, 1, 0);
             glBindTexture(GL_TEXTURE_2D, texId);
             sphere.setRadius(bodyRadius);
             sphere.draw();
@@ -831,4 +839,6 @@ void getUserDateInput() {
 
     view->date = desiredDate;
     model->setDate(view->date);
+
+    focusCurrentBody();
 }

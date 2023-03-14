@@ -65,5 +65,6 @@ These are libraries installed to reduce warngings and make building easier.
 - User Interface Improvments
   - Currently the start date is static. Dynamically pull the initial date to be the current day.
   - Make it so the user doesn't need to go to the window to the command line to update the date.
+  - Allow the user to adjust sensitivity
 - Visuals
   - Add skybox
