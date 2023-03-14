@@ -57,6 +57,8 @@ These are libraries installed to reduce warngings and make building easier.
 - ntp
 
 ## Future Improvements
+- Rendering Improvements
+  - Use LOD spheres depending on how much space the body takes up on the screen.
 - Refactoring
   - Refactor the messy main loop into it's own library like Render Manager or something of the like.
 - Orbital Mechanics Improvments
