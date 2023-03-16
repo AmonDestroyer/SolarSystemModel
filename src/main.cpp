@@ -472,7 +472,8 @@ void showInfo()
     drawString(ss.str().c_str(), 1, screenHeight-(line++ * TEXT_HEIGHT), color, font);
     ss.str("");
 
-    ss << "Refocus on Date Change: " << view->refocusOnDateChange << std::ends;
+    std::string refocus = (view->refocusOnDateChange) ? "true" : "false";
+    ss << "Refocus on Date Change: " << refocus << std::ends;
     drawString(ss.str().c_str(), 1, screenHeight-(line++ * TEXT_HEIGHT), color, font);
     ss.str("");
 
@@ -853,6 +854,13 @@ void getUserDateInput() {
     std::string desiredDate;
     std::cout << "Enter a Desired Date (yyyy-mm-dd): ";
     std::cin >> desiredDate;
+
+    struct tm tm;
+    while (strptime(desiredDate.c_str(), "%Y-%m-%d", &tm) == NULL) {
+        std::cout << "Invalid Date" << std::endl;
+        std::cout << "Enter a Date in the format yyyy-mm-dd: ";
+        std::cin >> desiredDate;
+    }
 
     view->date = desiredDate;
     model->setDate(view->date);
