@@ -58,8 +58,10 @@ void getUserDateInput();
 
 // Structs
 typedef struct view {
-    float fovLimits[2] = {0.001f, 45.0f};
+    float fovLimits[2] = {0.001f, 180.0f};
     float fov = 45.0f;
+    bool refocusOnDateChange = true;
+    bool drawLines = false;
     float near;
     float far;
     int nbodies;
@@ -101,8 +103,11 @@ std::map<std::string, std::string> texture_info = {
     {"Uranus", "uranus.bmp"},
     {"Neptune", "neptune.bmp"}
     };
+
+// How light from the light source is reflected based on the material property
+// {Ka, Kd, Ks, other(shinyness, Unused, Unused, Unused)}
 GLfloat bodyMaterials[][4][4] = {
-    {{0.1f, 0.1f, 0.1f, 1}, {0.7f, 0.7f, 0.7f, 1}, {1, 1, 1, 1}, {32, 0, 0, 0}},
+    {{0.2f, 0.2f, 0.2f, 1}, {0.7f, 0.7f, 0.7f, 1}, {1, 1, 1, 1}, {32, 0, 0, 0}},
     {{1, 1, 1, 1}, {0, 0, 0, 1}, {0, 0, 0, 1}, {0, 0, 0, 0}}
     };
 
@@ -328,7 +333,7 @@ void clearSharedMem()
 void initLights()
 {
     // set up light colors (ambient, diffuse, specular)
-    GLfloat lightKa[] = {0, 0, 0, 1};           // specular light
+    GLfloat lightKa[] = {1, 1, 1, 1};           // specular light
     GLfloat lightKd[] = {.7f, .7f, .7f, 1.0f};  // diffuse light
     GLfloat lightKs[] = {0, 0, 0, 1};           // specular light
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightKa);
@@ -352,7 +357,7 @@ void setCamera(glm::vec3 cameraPos, glm::vec3 target)
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(cameraPos.x, cameraPos.y, cameraPos.z, target.x, target.y, target.z, 0, 1, 0); // eye(x,y,z), focal(x,y,z), up(x,y,z)
+    gluLookAt(cameraPos.x, cameraPos.y, cameraPos.z, target.x, target.y, target.z, 0, 0, 1); // eye(x,y,z), focal(x,y,z), up(x,y,z)
 }
 
 
@@ -467,6 +472,10 @@ void showInfo()
     drawString(ss.str().c_str(), 1, screenHeight-(line++ * TEXT_HEIGHT), color, font);
     ss.str("");
 
+    ss << "Refocus on Date Change: " << view->refocusOnDateChange << std::ends;
+    drawString(ss.str().c_str(), 1, screenHeight-(line++ * TEXT_HEIGHT), color, font);
+    ss.str("");
+
 
     // Controls
     line++; // Add Blank line
@@ -487,6 +496,14 @@ void showInfo()
     ss.str("");
 
     ss << "Space = Refocus to Target" << std::ends;
+    drawString(ss.str().c_str(), 1, screenHeight-(line++ * TEXT_HEIGHT), color, font);
+    ss.str("");
+
+    ss << "R = Toggle Refocus on Date Change" << std::ends;
+    drawString(ss.str().c_str(), 1, screenHeight-(line++ * TEXT_HEIGHT), color, font);
+    ss.str("");
+
+    ss << "D = Display Sphere Render Lines" << std::ends;
     drawString(ss.str().c_str(), 1, screenHeight-(line++ * TEXT_HEIGHT), color, font);
     ss.str("");
 
@@ -617,28 +634,13 @@ void keyboardCB(unsigned char key, int x, int y)
         exit(0);
         break;
 
-    case 'd': // switch rendering modes (fill -> wire -> point)
+    case 'd': // switch rendering modes (lines or not)
     case 'D':
-        ++drawMode;
-        drawMode %= 3;
-        if(drawMode == 0)        // fill mode
-        {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            glEnable(GL_DEPTH_TEST);
-            glEnable(GL_CULL_FACE);
-        }
-        else if(drawMode == 1)  // wireframe mode
-        {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            glDisable(GL_DEPTH_TEST);
-            glDisable(GL_CULL_FACE);
-        }
-        else                    // point mode
-        {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-            glDisable(GL_DEPTH_TEST);
-            glDisable(GL_CULL_FACE);
-        }
+        view->drawLines = !view->drawLines;
+        break;
+    case 'r':
+    case 'R':
+        view->refocusOnDateChange = !view->refocusOnDateChange;
         break;
     case '`':
         getUserDateInput();
@@ -646,10 +648,16 @@ void keyboardCB(unsigned char key, int x, int y)
 
     case ' ':
         focusCurrentBody();
-        break;
+        break;        
 
     default:
         ;
+    }
+
+    int numCheck = key - 48;
+    if ((numCheck >= 0) && (numCheck <= 9)) {
+        view->currentBodyIndex = numCheck;
+        focusCurrentBody();
     }
 }
 
@@ -815,10 +823,14 @@ void generateModel() {
             GLuint texId = textureIds[i];
             glPushMatrix();
             glTranslatef(bodyPos.x, bodyPos.y, bodyPos.z);
-            glRotatef(-90, 0, 1, 0);
             glBindTexture(GL_TEXTURE_2D, texId);
             sphere.setRadius(bodyRadius);
-            sphere.draw();
+            if (view->drawLines) {
+                float lineColor[4] = {1, 1, 1, 0.2f};
+                sphere.drawWithLines(lineColor);
+            } else {
+                sphere.draw();
+            }
             glPopMatrix();
 
             // Update Frustom
@@ -845,5 +857,6 @@ void getUserDateInput() {
     view->date = desiredDate;
     model->setDate(view->date);
 
-    focusCurrentBody();
+    if (view->refocusOnDateChange)
+        focusCurrentBody();
 }

@@ -3,10 +3,12 @@
 // ==========
 // Sphere for OpenGL with (radius, sectors, stacks)
 // The min number of sectors is 3 and the min number of stacks are 2.
+// The default up axis is +Z axis. You can change the up axis with setUpAxis():
+// X=1, Y=2, Z=3.
 //
 //  AUTHOR: Song Ho Ahn (song.ahn@gmail.com)
 // CREATED: 2017-11-01
-// UPDATED: 2022-12-07
+// UPDATED: 2023-03-11
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifdef _WIN32
@@ -35,9 +37,9 @@ const int MIN_STACK_COUNT  = 2;
 ///////////////////////////////////////////////////////////////////////////////
 // ctor
 ///////////////////////////////////////////////////////////////////////////////
-Sphere::Sphere(float radius, int sectors, int stacks, bool smooth) : interleavedStride(32)
+Sphere::Sphere(float radius, int sectors, int stacks, bool smooth, int up) : interleavedStride(32)
 {
-    set(radius, sectors, stacks, smooth);
+    set(radius, sectors, stacks, smooth, up);
 }
 
 
@@ -45,16 +47,20 @@ Sphere::Sphere(float radius, int sectors, int stacks, bool smooth) : interleaved
 ///////////////////////////////////////////////////////////////////////////////
 // setters
 ///////////////////////////////////////////////////////////////////////////////
-void Sphere::set(float radius, int sectors, int stacks, bool smooth)
+void Sphere::set(float radius, int sectors, int stacks, bool smooth, int up)
 {
-    this->radius = radius;
+    if(radius > 0)
+        this->radius = radius;
     this->sectorCount = sectors;
     if(sectors < MIN_SECTOR_COUNT)
         this->sectorCount = MIN_SECTOR_COUNT;
     this->stackCount = stacks;
-    if(sectors < MIN_STACK_COUNT)
-        this->sectorCount = MIN_STACK_COUNT;
+    if(stacks < MIN_STACK_COUNT)
+        this->stackCount = MIN_STACK_COUNT;
     this->smooth = smooth;
+    this->upAxis = up;
+    if(up < 1 || up > 3)
+        this->upAxis = 3;
 
     if(smooth)
         buildVerticesSmooth();
@@ -65,19 +71,19 @@ void Sphere::set(float radius, int sectors, int stacks, bool smooth)
 void Sphere::setRadius(float radius)
 {
     if(radius != this->radius)
-        set(radius, sectorCount, stackCount, smooth);
+        set(radius, sectorCount, stackCount, smooth, upAxis);
 }
 
 void Sphere::setSectorCount(int sectors)
 {
     if(sectors != this->sectorCount)
-        set(radius, sectors, stackCount, smooth);
+        set(radius, sectors, stackCount, smooth, upAxis);
 }
 
 void Sphere::setStackCount(int stacks)
 {
     if(stacks != this->stackCount)
-        set(radius, sectorCount, stacks, smooth);
+        set(radius, sectorCount, stacks, smooth, upAxis);
 }
 
 void Sphere::setSmooth(bool smooth)
@@ -90,6 +96,15 @@ void Sphere::setSmooth(bool smooth)
         buildVerticesSmooth();
     else
         buildVerticesFlat();
+}
+
+void Sphere::setUpAxis(int up)
+{
+    if(this->upAxis == up || up < 1 || up > 3)
+        return;
+
+    changeUpAxis(this->upAxis, up);
+    this->upAxis = up;
 }
 
 
@@ -136,6 +151,7 @@ void Sphere::printSelf() const
               << "  Sector Count: " << sectorCount << "\n"
               << "   Stack Count: " << stackCount << "\n"
               << "Smooth Shading: " << (smooth ? "true" : "false") << "\n"
+              << "       Up Axis: " << (upAxis == 1 ? "X" : (upAxis == 2 ? "Y" : "Z")) << "\n"
               << "Triangle Count: " << getTriangleCount() << "\n"
               << "   Index Count: " << getIndexCount() << "\n"
               << "  Vertex Count: " << getVertexCount() << "\n"
@@ -260,7 +276,7 @@ void Sphere::clearArrays()
 ///////////////////////////////////////////////////////////////////////////////
 void Sphere::buildVerticesSmooth()
 {
-    const float PI = acos(-1);
+    const float PI = acos(-1.0f);
 
     // clear memory of prev arrays
     clearArrays();
@@ -340,6 +356,10 @@ void Sphere::buildVerticesSmooth()
 
     // generate interleaved vertex array as well
     buildInterleavedVertices();
+
+    // change up axis from Z-axis to the given
+    if(this->upAxis != 3)
+        changeUpAxis(3, this->upAxis);
 }
 
 
@@ -350,7 +370,7 @@ void Sphere::buildVerticesSmooth()
 ///////////////////////////////////////////////////////////////////////////////
 void Sphere::buildVerticesFlat()
 {
-    const float PI = acos(-1);
+    const float PI = acos(-1.0f);
 
     // tmp vertex definition (x,y,z,s,t)
     struct Vertex
@@ -508,6 +528,10 @@ void Sphere::buildVerticesFlat()
 
     // generate interleaved vertex array as well
     buildInterleavedVertices();
+
+    // change up axis from Z-axis to the given
+    if(this->upAxis != 3)
+        changeUpAxis(3, this->upAxis);
 }
 
 
@@ -534,6 +558,88 @@ void Sphere::buildInterleavedVertices()
 
         interleavedVertices.push_back(texCoords[j]);
         interleavedVertices.push_back(texCoords[j+1]);
+    }
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// transform vertex/normal (x,y,z) coords
+// assume from/to values are validated: 1~3 and from != to
+///////////////////////////////////////////////////////////////////////////////
+void Sphere::changeUpAxis(int from, int to)
+{
+    // initial transform matrix cols
+    float tx[] = {1.0f, 0.0f, 0.0f};    // x-axis (left)
+    float ty[] = {0.0f, 1.0f, 0.0f};    // y-axis (up)
+    float tz[] = {0.0f, 0.0f, 1.0f};    // z-axis (forward)
+
+    // X -> Y
+    if(from == 1 && to == 2)
+    {
+        tx[0] =  0.0f; tx[1] =  1.0f;
+        ty[0] = -1.0f; ty[1] =  0.0f;
+    }
+    // X -> Z
+    else if(from == 1 && to == 3)
+    {
+        tx[0] =  0.0f; tx[2] =  1.0f;
+        tz[0] = -1.0f; tz[2] =  0.0f;
+    }
+    // Y -> X
+    else if(from == 2 && to == 1)
+    {
+        tx[0] =  0.0f; tx[1] = -1.0f;
+        ty[0] =  1.0f; ty[1] =  0.0f;
+    }
+    // Y -> Z
+    else if(from == 2 && to == 3)
+    {
+        ty[1] =  0.0f; ty[2] =  1.0f;
+        tz[1] = -1.0f; tz[2] =  0.0f;
+    }
+    //  Z -> X
+    else if(from == 3 && to == 1)
+    {
+        tx[0] =  0.0f; tx[2] = -1.0f;
+        tz[0] =  1.0f; tz[2] =  0.0f;
+    }
+    // Z -> Y
+    else
+    {
+        ty[1] =  0.0f; ty[2] = -1.0f;
+        tz[1] =  1.0f; tz[2] =  0.0f;
+    }
+
+    std::size_t i, j;
+    std::size_t count = vertices.size();
+    float vx, vy, vz;
+    float nx, ny, nz;
+    for(i = 0, j = 0; i < count; i += 3, j += 8)
+    {
+        // transform vertices
+        vx = vertices[i];
+        vy = vertices[i+1];
+        vz = vertices[i+2];
+        vertices[i]   = tx[0] * vx + ty[0] * vy + tz[0] * vz;   // x
+        vertices[i+1] = tx[1] * vx + ty[1] * vy + tz[1] * vz;   // y
+        vertices[i+2] = tx[2] * vx + ty[2] * vy + tz[2] * vz;   // z
+
+        // transform normals
+        nx = normals[i];
+        ny = normals[i+1];
+        nz = normals[i+2];
+        normals[i]   = tx[0] * nx + ty[0] * ny + tz[0] * nz;   // nx
+        normals[i+1] = tx[1] * nx + ty[1] * ny + tz[1] * nz;   // ny
+        normals[i+2] = tx[2] * nx + ty[2] * ny + tz[2] * nz;   // nz
+
+        // trnasform interleaved array
+        interleavedVertices[j]   = vertices[i];
+        interleavedVertices[j+1] = vertices[i+1];
+        interleavedVertices[j+2] = vertices[i+2];
+        interleavedVertices[j+3] = normals[i];
+        interleavedVertices[j+4] = normals[i+1];
+        interleavedVertices[j+5] = normals[i+2];
     }
 }
 

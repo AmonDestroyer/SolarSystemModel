@@ -2,11 +2,13 @@
 // Sphere.h
 // ========
 // Sphere for OpenGL with (radius, sectors, stacks)
-// The min number of sectors is 3 and The min number of stacks are 2.
+// The min number of sectors is 3 and the min number of stacks are 2.
+// The default up axis is +Z axis. You can change the up axis with setUpAxis():
+// X=1, Y=2, Z=3.
 //
 //  AUTHOR: Song Ho Ahn (song.ahn@gmail.com)
 // CREATED: 2017-11-01
-// UPDATED: 2022-12-07
+// UPDATED: 2023-03-11
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef GEOMETRY_SPHERE_H
@@ -18,18 +20,20 @@ class Sphere
 {
 public:
     // ctor/dtor
-    Sphere(float radius=1.0f, int sectorCount=36, int stackCount=18, bool smooth=true);
+    Sphere(float radius=1.0f, int sectorCount=36, int stackCount=18, bool smooth=true, int up=3);
     ~Sphere() {}
 
     // getters/setters
     float getRadius() const                 { return radius; }
     int getSectorCount() const              { return sectorCount; }
     int getStackCount() const               { return stackCount; }
-    void set(float radius, int sectorCount, int stackCount, bool smooth=true);
+    int getUpAxis() const                   { return upAxis; }
+    void set(float radius, int sectorCount, int stackCount, bool smooth=true, int up=3);
     void setRadius(float radius);
     void setSectorCount(int sectorCount);
     void setStackCount(int stackCount);
     void setSmooth(bool smooth);
+    void setUpAxis(int up);
     void reverseNormals();
 
     // for vertex data
@@ -71,6 +75,7 @@ private:
     void buildVerticesSmooth();
     void buildVerticesFlat();
     void buildInterleavedVertices();
+    void changeUpAxis(int from, int to);
     void clearArrays();
     void addVertex(float x, float y, float z);
     void addNormal(float x, float y, float z);
@@ -85,6 +90,7 @@ private:
     int sectorCount;                        // longitude, # of slices
     int stackCount;                         // latitude, # of stacks
     bool smooth;
+    int upAxis;                             // +X=1, +Y=2, +z=3 (default)
     std::vector<float> vertices;
     std::vector<float> normals;
     std::vector<float> texCoords;
