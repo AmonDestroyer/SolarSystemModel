@@ -101,7 +101,10 @@ std::map<std::string, std::string> texture_info = {
     {"Uranus", "uranus.bmp"},
     {"Neptune", "neptune.bmp"}
     };
-
+GLfloat bodyMaterials[][4][4] = {
+    {{0.1f, 0.1f, 0.1f, 1}, {0.7f, 0.7f, 0.7f, 1}, {1, 1, 1, 1}, {32, 0, 0, 0}},
+    {{1, 1, 1, 1}, {0, 0, 0, 1}, {0, 0, 0, 1}, {0, 0, 0, 0}}
+    };
 
 // global variables
 bool firstRender = true;
@@ -566,17 +569,6 @@ void displayCB()
 
     //Set the camera position and look direction
     setCamera(view->camera, view->target);
-    
-
-    // set material
-    float ambient[]  = {0.1f, 0.1f, 0.1f, 1};
-    float diffuse[]  = {0.7f, 0.7f, 0.7f, 1};
-    float specular[] = {1.0f, 1.0f, 1.0f, 1};
-    float shininess  = 32;
-    glMaterialfv(GL_FRONT, GL_AMBIENT,   ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE,   diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR,  specular);
-    glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
     // // draw right sphere with texture
     generateModel();
@@ -804,6 +796,19 @@ void generateModel() {
             if (name != targetName) {
                 view->visibleBodies += ", " + name;
             }
+
+            // set material
+            int materialIndex;
+            if (name == "Sun") {
+                materialIndex = 1;
+            } else {
+                materialIndex = 0;
+            }
+
+            glMaterialfv(GL_FRONT, GL_AMBIENT,   bodyMaterials[materialIndex][0]);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE,   bodyMaterials[materialIndex][1]);
+            glMaterialfv(GL_FRONT, GL_SPECULAR,  bodyMaterials[materialIndex][2]);
+            glMaterialf(GL_FRONT, GL_SHININESS, bodyMaterials[materialIndex][3][0]);
 
             //Model item and apply texture
             float bodyRadius = body->getRadius();
