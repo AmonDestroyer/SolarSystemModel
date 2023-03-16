@@ -40,12 +40,13 @@ Below is a list of all required libraries that need to be installed installed.
 - libglfw3-dev
 - libglew-dev
 - libglm-dev
+- freeglut3-dev
 
 All libraries can be installed after running the below commands.
 
 `sudo apt-get update`
 
-`sudo apt-get install libcurl4-openssl-dev libglfw3-dev libglew-dev libglm-dev`
+`sudo apt-get install libcurl4-openssl-dev libglfw3-dev libglew-dev libglm-dev freeglut3-dev`
 
 #### Utilized Open Source Code
 Below is a list of all open source code utilized in the generation of this project.
