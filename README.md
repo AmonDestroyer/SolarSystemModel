@@ -5,14 +5,21 @@ Interactive graphical model of the solar system utilizing OpenGL and NASA's Open
 This project is for the University of Oregon's CS 441 (Introduction to Computational Graphics) final project.
 The project shows knowledge gained and expanded upon during the 2023 Winter term.
 
-### Learnings
+### Learning Journey
+There were many key learnings taken away from this project. Many ranging from modeling errors to external interfaces.
+
+1. Working on Windows: I found it challenging when working on windows with OpenGL as when I wanted to add new libraries it became extremely difficult to work in wondows and dealing with VS to compile C code. I ended up moving to a Debian VM to work on the project because of the inherrantly difficult error I ran into while working on the project.
+2. Learning a New Library: When determining that my model would get it's data from a [NASA API](https://api.nasa.gov/) I had to figure out how my application would interface with the API and this resulted in me having to learn how to utilize [libcurl](https://curl.se/libcurl/) to make these API calls.
+3. Parsing API Data: My Model gets it's body position information based on the [NASA's Horizons  API](https://ssd-api.jpl.nasa.gov/doc/horizons.html) which came along with it's own challenge of creating a library that could properly communicate and extract data from the API. The main challenge here was that NASA's Horizons API does not provide a well structured json response, but a dump of data in a [results field](https://ssd-api.jpl.nasa.gov/doc/horizons.html#:~:text=Example%20json%2Dformat%20Output).
+4. Trying On My Own: I swear I spent 10 hours, the time initially estimated for item 1 in the project proposal, to figuring out how to apply a texture from various jpegs and render the sphere without artifacts (See Frustom Artifacting in the below section). After taking this time to model staticly colored spheres for each body I ended up needing to move to open source [sphere and texturing](http://www.songho.ca/opengl/gl_sphere.html) which allowed me to apply texturing from my gathered bitmap images.
+![OpenGL Spheres](/imgs/openSourceExample.png "OpenGL Spheres")
+5. Using Open Source Code:  While using the open source code was helpful, it came with it's own challenges. It took time to learn what each portion of the open source code was doing and how to modify the camera position change the target and ensure the lighting was correct on each body. This was evident in lighting errors I was recieving. See initially I was updating the camera position and direction during each fram render and the lighting was only being set up during initialization. Since the camera was being updated after the lighting this resulted in the lighting to render on the objects as if the light was at the position relative to the cameras coordinate system, not hte homogeneous object coordinates.
+![Lighting Error](/imgs/erros_lighting.png "Lighting Error")
+
+#### Key Learnings
 - Frustom Artifacting: Have a near and far frustom that are are too far appart from each other will cause issues like missing triangles seen here.
 
 ![Distant Frustom Artifacting](/imgs/sphereArtifacting.png "Distant Frustom Artifacting")
-
-- Open Source Tools/References: Finding and using open source tools and references was a major learning in this project as initially I tried to refactor code provided in Project 2A (Rendering a Dog in OpenGL), but I kept running into issues like how to get user input and texture rendering. Using the open source code for json parsing and sphere generation/texturing provided a base that could be referenced and updated.
-
-- Learning how to convert typical math expressions to code was a challenge for this project, but I was able to relearn and properly implement projections of vector math to get the desired location and renderings. 
 
 ### Failures/Successes
 #### Failures
