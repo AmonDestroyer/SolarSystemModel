@@ -23,7 +23,7 @@ There were many key learnings taken away from this project. Many ranging from mo
 
 ### Failures/Successes
 #### Failures
-- Initial proposal was too ambitious and as such items 1-3 in the proposal were completed.
+- Initial proposal was too ambitious and as such items 1-4 in the proposal were completed. Though it was realized that the body properties for any item other than the sun was negligible as solar bodies don't have any spcular lighting and the main change is due to ambient properties with can still be modeled as somthing negligible.
 - I initially tried to work with the provided cmake file, but it was prooved to be more challenging and messy than anticipated. So I ended up moving to a Makefile in the source directory. This meant that the project was less portable due to the lack of a cmake file.
 
 #### Successes
