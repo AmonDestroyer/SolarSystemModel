@@ -583,20 +583,18 @@ void displayCB()
         focusCurrentBody(true);
     }
 
-    // clear buffer
+    // clear bufferd
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    // save the initial ModelView matrix before modifying ModelView matrix
+    // Copy current GL_MODELVIEW
     glPushMatrix();
-
-    //Set the camera position and look direction
-    setCamera(view->camera, view->target);
 
     // // draw right sphere with texture
     generateModel();
 
     showInfo();     // print max range of glDrawRangeElements
 
+    // return updated
     glPopMatrix();
 
     glutSwapBuffers();
@@ -770,6 +768,12 @@ void focusCurrentBody(bool zoom) {
     view->target = target->getPos();
     glm::vec3 vecCameraTarget = view->target - view->camera;
     float desiredFov = glm::degrees(atan2(4*target->getRadius(), glm::length(vecCameraTarget)));
+
+    //Update camera target
+    setCamera(view->camera, view->target);
+    initLights();
+    
+    
     if (zoom)
         setFov(desiredFov);
 }
@@ -872,7 +876,6 @@ void getUserDateInput() {
 void setModelDate(std::string date) {
     view->date = date;
     model->setDate(view->date);
-    initLights();
 
     focusCurrentBody(view->rezoomOnDateChange);
 }
