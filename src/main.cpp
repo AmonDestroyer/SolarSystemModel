@@ -74,8 +74,8 @@ typedef struct view {
 } View;
 
 // constants
-const int   SCREEN_WIDTH    = 1000;
-const int   SCREEN_HEIGHT   = 1000;
+const int   SCREEN_WIDTH    = 850;
+const int   SCREEN_HEIGHT   = 850;
 const float CAMERA_DISTANCE = 4.0f;
 const int   TEXT_WIDTH      = 8;
 const int   TEXT_HEIGHT     = 13;
