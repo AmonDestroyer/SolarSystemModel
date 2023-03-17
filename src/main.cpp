@@ -59,7 +59,7 @@ void setModelDate(std::string date);
 
 // Structs
 typedef struct view {
-    float fovLimits[2] = {0.001f, 180.0f};
+    float fovLimits[2] = {0.001f, 45.0f};
     float fov = 45.0f;
     bool rezoomOnDateChange = true;
     bool drawLines = false;
@@ -108,7 +108,7 @@ std::map<std::string, std::string> texture_info = {
 // How light from the light source is reflected based on the material property
 // {Ka, Kd, Ks, other(shinyness, Unused, Unused, Unused)}
 GLfloat bodyMaterials[][4][4] = {
-    {{0.2f, 0.2f, 0.2f, 1}, {0.7f, 0.7f, 0.7f, 1}, {1, 1, 1, 1}, {32, 0, 0, 0}},
+    {{0.1f, 0.1f, 0.1f, 1}, {0.9f, 0.9f, 0.9f, 1}, {0.0f, 0.0f, 0.0f, 1}, {0, 0, 0, 0}},
     {{1, 1, 1, 1}, {0, 0, 0, 1}, {0, 0, 0, 1}, {0, 0, 0, 0}}
     };
 
