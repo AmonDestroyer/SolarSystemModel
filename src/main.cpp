@@ -334,6 +334,7 @@ void clearSharedMem()
 void initLights()
 {
     // set up light colors (ambient, diffuse, specular)
+    glDisable(GL_LIGHT0);
     GLfloat lightKa[] = {1, 1, 1, 1};           // specular light
     GLfloat lightKd[] = {.7f, .7f, .7f, 1.0f};  // diffuse light
     GLfloat lightKs[] = {1, 1, 1, 1};           // specular light
@@ -343,8 +344,10 @@ void initLights()
 
     // position the light
     glm::vec3 sunPos = model->getBody("Sun")->getPos();
-    float lightPos[4] = {-sunPos.x, -sunPos.y, -sunPos.z, 1}; // directional light
+    float lightPos[4] = {sunPos.x, sunPos.y, sunPos.z, 1};
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+    float lightAttenuation = 0.000000001f;
+    glLightfv(GL_LIGHT0, GL_LINEAR_ATTENUATION, &lightAttenuation);
 
     glEnable(GL_LIGHT0);                        // MUST enable each light source after configuration
 }
