@@ -14,7 +14,7 @@ There were many key learnings taken away from this project. Many ranging from mo
 4. Trying On My Own: I swear I spent 10 hours, the time initially estimated for item 1 in the project proposal, to figuring out how to apply a texture from various jpegs and render the sphere without artifacts (See Frustom Artifacting in the below section). After taking this time to model staticly colored spheres for each body I ended up needing to move to open source [sphere and texturing](http://www.songho.ca/opengl/gl_sphere.html) which allowed me to apply texturing from my gathered bitmap images.
 ![OpenGL Spheres](/imgs/openSourceExample.png "OpenGL Spheres")
 5. Using Open Source Code:  While using the open source code was helpful, it came with it's own challenges. It took time to learn what each portion of the open source code was doing and how to modify the camera position change the target and ensure the lighting was correct on each body. This was evident in lighting errors I was recieving. See initially I was updating the camera position and direction during each fram render and the lighting was only being set up during initialization. Since the camera was being updated after the lighting this resulted in the lighting to render on the objects as if the light was at the position relative to the cameras coordinate system, not hte homogeneous object coordinates.
-![Lighting Error](/imgs/erros_lighting.png "Lighting Error")
+![Lighting Error](/imgs/errors_lighting.png "Lighting Error")
 
 #### Key Learnings
 - Frustom Artifacting: Have a near and far frustom that are are too far appart from each other will cause issues like missing triangles seen here.
