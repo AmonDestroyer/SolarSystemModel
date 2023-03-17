@@ -52,15 +52,16 @@ void toPerspective(float fov, float near, float far);
 GLuint loadTexture(const char* fileName, bool wrap=true);
 void zoom(int dir);
 void setFov(float desiredFov);
-void focusCurrentBody();
+void focusCurrentBody(bool zoom);
 void generateModel();
 void getUserDateInput();
+void setModelDate(std::string date);
 
 // Structs
 typedef struct view {
     float fovLimits[2] = {0.001f, 180.0f};
     float fov = 45.0f;
-    bool refocusOnDateChange = true;
+    bool rezoomOnDateChange = true;
     bool drawLines = false;
     float near;
     float far;
@@ -335,14 +336,14 @@ void initLights()
     // set up light colors (ambient, diffuse, specular)
     GLfloat lightKa[] = {1, 1, 1, 1};           // specular light
     GLfloat lightKd[] = {.7f, .7f, .7f, 1.0f};  // diffuse light
-    GLfloat lightKs[] = {0, 0, 0, 1};           // specular light
+    GLfloat lightKs[] = {1, 1, 1, 1};           // specular light
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightKa);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightKd);
     glLightfv(GL_LIGHT0, GL_SPECULAR, lightKs);
 
     // position the light
     glm::vec3 sunPos = model->getBody("Sun")->getPos();
-    float lightPos[4] = {sunPos.x, sunPos.y, sunPos.z, 1}; // directional light
+    float lightPos[4] = {-sunPos.x, -sunPos.y, -sunPos.z, 1}; // directional light
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
     glEnable(GL_LIGHT0);                        // MUST enable each light source after configuration
@@ -472,8 +473,8 @@ void showInfo()
     drawString(ss.str().c_str(), 1, screenHeight-(line++ * TEXT_HEIGHT), color, font);
     ss.str("");
 
-    std::string refocus = (view->refocusOnDateChange) ? "true" : "false";
-    ss << "Refocus on Date Change: " << refocus << std::ends;
+    std::string rezoom = (view->rezoomOnDateChange) ? "true" : "false";
+    ss << "Zoom to Target on Date Change: " << rezoom << std::ends;
     drawString(ss.str().c_str(), 1, screenHeight-(line++ * TEXT_HEIGHT), color, font);
     ss.str("");
 
@@ -576,7 +577,7 @@ void displayCB()
     // Get Textures
     if (firstRender) {
         firstRender = false;
-        focusCurrentBody();
+        focusCurrentBody(true);
     }
 
     // clear buffer
@@ -641,14 +642,14 @@ void keyboardCB(unsigned char key, int x, int y)
         break;
     case 'r':
     case 'R':
-        view->refocusOnDateChange = !view->refocusOnDateChange;
+        view->rezoomOnDateChange = !view->rezoomOnDateChange;
         break;
     case '`':
         getUserDateInput();
         break;
 
     case ' ':
-        focusCurrentBody();
+        focusCurrentBody(true);
         break;        
 
     default:
@@ -658,7 +659,7 @@ void keyboardCB(unsigned char key, int x, int y)
     int numCheck = key - 48;
     if ((numCheck >= 0) && (numCheck <= 9)) {
         view->currentBodyIndex = numCheck;
-        focusCurrentBody();
+        focusCurrentBody(true);
     }
 }
 
@@ -669,13 +670,13 @@ void specialKeyboardCB(int key, int x, int y) {
         case GLUT_KEY_RIGHT:
         view->currentBodyIndex++;
         view->currentBodyIndex %= view->nbodies;
-        focusCurrentBody();
+        focusCurrentBody(true);
         break;
         // Previous Selection
         case GLUT_KEY_LEFT:
         view->currentBodyIndex += view->nbodies - 1;
         view->currentBodyIndex %= view->nbodies;
-        focusCurrentBody();
+        focusCurrentBody(true);
         break;
     }
 }
@@ -748,7 +749,6 @@ void mouseMotionCB(int x, int y)
 
 void zoom(int dir) {
     float sensitivity = 0.1f;
-    // cameraDistance -= dir * sensitivity;
     float desiredFov = view->fov * (1 + dir*sensitivity);
     setFov(desiredFov);
 }
@@ -761,13 +761,14 @@ void setFov(float desiredFov) {
     view->fov = desiredFov;
 }
 
-void focusCurrentBody() {    
+void focusCurrentBody(bool zoom) {    
     std::string targetName = viewableBodies[view->currentBodyIndex];
     Body *target = model->getBody(targetName);
     view->target = target->getPos();
     glm::vec3 vecCameraTarget = view->target - view->camera;
     float desiredFov = glm::degrees(atan2(4*target->getRadius(), glm::length(vecCameraTarget)));
-    setFov(desiredFov);
+    if (zoom)
+        setFov(desiredFov);
 }
 
 
@@ -862,9 +863,13 @@ void getUserDateInput() {
         std::cin >> desiredDate;
     }
 
-    view->date = desiredDate;
-    model->setDate(view->date);
+    setModelDate(desiredDate);
+}
 
-    if (view->refocusOnDateChange)
-        focusCurrentBody();
+void setModelDate(std::string date) {
+    view->date = date;
+    model->setDate(view->date);
+    initLights();
+
+    focusCurrentBody(view->rezoomOnDateChange);
 }
