@@ -22,6 +22,10 @@ There were many key learnings taken away from this project. Many ranging from mo
 
 ![Distant Frustom Artifacting](/imgs/sphereArtifacting.png "Distant Frustom Artifacting")
 
+- Sometimes it is hard to mentally imagine the positions when working on such a large scale. I was able to make this seem clearer by modeling the positions in reality.
+
+![Modeling Using Dice](/imgs/realityModelingPositions.jpg "Modeling Using Dice")
+
 ### Failures/Successes
 #### Failures
 - Initial proposal was too ambitious and as such items 1-4 in the proposal were completed. Though it was realized that the body properties for any item other than the sun was negligible as solar bodies don't have any spcular lighting and the main change is due to ambient properties with can still be modeled as somthing negligible.
