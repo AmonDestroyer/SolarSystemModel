@@ -59,7 +59,7 @@ void setModelDate(std::string date);
 
 // Structs
 typedef struct view {
-    float fovLimits[2] = {0.001f, 45.0f};
+    float fovLimits[2] = {0.001f, 90.0f};
     float fov = 45.0f;
     bool rezoomOnDateChange = true;
     bool drawLines = false;
