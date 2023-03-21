@@ -108,7 +108,7 @@ std::map<std::string, std::string> texture_info = {
 // How light from the light source is reflected based on the material property
 // {Ka, Kd, Ks, other(shinyness, Unused, Unused, Unused)}
 GLfloat bodyMaterials[][4][4] = {
-    {{0.1f, 0.1f, 0.1f, 1}, {0.9f, 0.9f, 0.9f, 1}, {0.0f, 0.0f, 0.0f, 1}, {0, 0, 0, 0}},
+    {{0.15f, 0.15f, 0.15f, 1}, {0.9f, 0.9f, 0.9f, 1}, {0.0f, 0.0f, 0.0f, 1}, {0, 0, 0, 0}},
     {{1, 1, 1, 1}, {0, 0, 0, 1}, {0, 0, 0, 1}, {0, 0, 0, 0}}
     };
 
